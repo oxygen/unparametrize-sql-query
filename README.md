@@ -92,3 +92,42 @@ FROM xxxx
 ```sql
 SELECT DISTINCT unique_random_numbers_anyway, ( SELECT * FROM whatever FORCE INDEX (bigger_than_the_table_itself) ), ? / ? * ?, ? / ? * ?, ? AS I_AM_A_blob, COUNT(*), CONCAT('?', '?', '?', ?) FROM users LEFT JOIN something ON something.user_id = users.user_id WHERE something.user_id IS NULL AND user_id = ? AND wage > ? AND name LIKE '?' ORDER BY user_date_created DESC LIMIT ? UNION SELECT `database name with spaces`.`012345799` FROM xxxx
 ```
+
+#### Output with whitespace preserved
+```sql
+SELECT
+	DISTINCT unique_random_numbers_anyway,
+	(
+		SELECT
+			*
+		FROM whatever
+		FORCE INDEX (bigger_than_the_table_itself)
+	),
+	? / ? * ?,
+	? / ? * ?,
+	? AS I_AM_A_blob,
+	COUNT(*),
+	CONCAT('?', '?', '?', ?)
+FROM users
+LEFT JOIN something ON something.user_id = users.user_id
+WHERE
+	something.user_id IS NULL
+
+	AND
+	user_id = ?
+
+	AND
+	wage > ?
+
+	AND
+	name LIKE '?'
+ORDER BY
+	user_date_created DESC
+LIMIT ?
+
+UNION
+
+SELECT
+	`database name with spaces`.`012345799`
+FROM xxxx
+```
