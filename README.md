@@ -25,7 +25,7 @@ npm i unparametrize-sql-query
 
 ## Usage
 
-See `index.js` for options.
+See [index.js](./index.js) for options.
 
 ### Node.js
 ```JavaScript
