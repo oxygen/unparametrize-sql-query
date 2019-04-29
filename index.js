@@ -332,14 +332,20 @@ function unparametrize_sql_query(
 									++i;
 									nCharCode = strSQL.charCodeAt(i);
 
-									if(bWhiteSpaceEncountered && bStripWhiteSpace)
+									if(bStripWhiteSpace)
 									{
 										while(i < strSQL.length)
 										{
 											if([" ", "\t", "\r", "\n"].includes(strSQL[i]))
 											{
-												++i;
-												nCharCode = strSQL.charCodeAt(i);
+												if(bWhiteSpaceEncountered)
+												{
+													++i;
+													nCharCode = strSQL.charCodeAt(i);
+												}
+
+												bWhiteSpaceEncountered = true;
+
 												continue;
 											}
 											
