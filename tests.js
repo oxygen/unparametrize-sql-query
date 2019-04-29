@@ -35,6 +35,9 @@ const strOutputSQL_MySQL = unparametrize_sql_query(/*sql*/ `
 		),
 		1 / 0 * 3, -- Division by zero?,
 		111 / 0 * 333, -- Division by zero?,
+		-5 / -1000.11 +3,
+		-999,
+		1 + (-9) - 3 + ( -    99),
 		0xAFE0 AS I_AM_A_blob,
 		COUNT(*), -- is this allowed here anyway?,
 		CONCAT('', 'aaaa', 'bbbb', 1234)
@@ -67,7 +70,7 @@ const strOutputSQL_MySQL = unparametrize_sql_query(/*sql*/ `
 	FROM xxxx
 `, {bThrowOnSyntaxError: true});
 
-const strControlValue_MySQL = "SELECT DISTINCT unique_random_numbers_anyway, ( SELECT * FROM whatever FORCE INDEX (bigger_than_the_table_itself) ), ? / ? * ?, ? / ? * ?, ? AS I_AM_A_blob, COUNT(*), CONCAT('?', '?', '?', ?) FROM users LEFT JOIN something ON something.user_id = users.user_id WHERE something.user_id IS NULL AND user_id = ? AND wage > ? AND name LIKE '?' ORDER BY user_date_created DESC LIMIT ? UNION SELECT `database name with spaces`.`012345799` FROM xxxx";
+const strControlValue_MySQL = "SELECT DISTINCT unique_random_numbers_anyway, ( SELECT * FROM whatever FORCE INDEX (bigger_than_the_table_itself) ), ? / ? * ?, ? / ? * ?, ? / ? +?, ?, ? + (?) - ? + ( ?), ? AS I_AM_A_blob, COUNT(*), CONCAT(?, ?, ?, ?) FROM users LEFT JOIN something ON something.user_id = users.user_id WHERE something.user_id IS NULL AND user_id = ? AND wage > ? AND name LIKE ? ORDER BY user_date_created DESC LIMIT ? UNION SELECT `database name with spaces`.`012345799` FROM xxxx";
 assert.strictEqual(strOutputSQL_MySQL, strControlValue_MySQL, `${strOutputSQL_MySQL} !== ${strControlValue_MySQL}`);
 
 

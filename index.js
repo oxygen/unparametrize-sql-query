@@ -20,7 +20,10 @@ function unparametrize_sql_query(
 		bWriteSyntaxErrorsToConsole = true, 
 
 		// You may turn this off for performance reasons (avoid a try catch).
-		bThrowOnSyntaxError = true
+		bThrowOnSyntaxError = true,
+
+		// Wether to add string quotes like MySQL Performance Schema does: '?' instead of ?.
+		bAddRemovedStringQuotes = false
 	} = {}
 )
 {
@@ -47,7 +50,7 @@ function unparametrize_sql_query(
 		if(strInsideStringLiteralDelimiter)
 		{
 			// Placeholder for the value that once was.
-			strOutputSQL += "'?'";
+			strOutputSQL += bAddRemovedStringQuotes ? "'?'" : "?";
 
 			while(
 				strSQL[i] !== strInsideStringLiteralDelimiter
@@ -299,6 +302,59 @@ function unparametrize_sql_query(
 			
 			default:
 				let nCharCode = strSQL.charCodeAt(i);
+
+				// Skip number sign (+ or -) if before a number and right after other arithmetic operators, bitwise operators, left round paranthesis or comma.
+				if(strSQL[i] === "-" || strSQL[i] === "+")
+				{
+					let nCharacterPosition = i;
+					while(++nCharacterPosition < strSQL.length)
+					{
+						if(
+							strSQL.charCodeAt(nCharacterPosition) >= /*0*/ 0x30 
+							&& strSQL.charCodeAt(nCharacterPosition) <= /*9*/ 0x39
+						)
+						{
+							nCharacterPosition = i;
+							let bWhiteSpaceEncountered = false;
+							while(--nCharacterPosition >= 0)
+							{
+								if([" ", "\t", "\r", "\n"].includes(strSQL[nCharacterPosition]))
+								{
+									bWhiteSpaceEncountered = true;
+									continue;
+								}
+			
+								if(
+									["+", "-", "/", "*", "%", "&", "~", "|", "^", "(", ","].includes(strSQL[nCharacterPosition])
+									|| [">>", "<<"].includes(strSQL.substr(nCharacterPosition - 1, 2))
+								)
+								{
+									++i;
+									nCharCode = strSQL.charCodeAt(i);
+
+									if(bWhiteSpaceEncountered && bStripWhiteSpace)
+									{
+										while(i < strSQL.length)
+										{
+											if([" ", "\t", "\r", "\n"].includes(strSQL[i]))
+											{
+												++i;
+												nCharCode = strSQL.charCodeAt(i);
+												continue;
+											}
+											
+											break;
+										}
+									}
+								}
+
+								break;
+							}
+
+							break;
+						}
+					}
+				}
 
 				if(
 					nCharCode >= /*0*/ 0x30 
