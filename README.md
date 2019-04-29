@@ -4,7 +4,7 @@
 
 [![Linux build](https://travis-ci.org/oxygen/unparametrize-sql-query.svg?branch=master)](https://travis-ci.org/oxygen/unparametrize-sql-query)
 
-Removes string literals, number constants and excess whitespace from an SQL **in one pass**. The removed string literals and number constants are replaced with `'?'` and `?` respectively.
+Removes string literals, number constants, comments and excess whitespace from an SQL **in one pass**. The removed string literals and number constants are replaced with `'?'` and `?` respectively.
 
 The goal is to reduce a query to a unique (common) form which could be used, for example, to keep performance counters per query (just like MySQL Performance Reports does).
 
