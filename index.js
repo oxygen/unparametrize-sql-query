@@ -349,9 +349,6 @@ function unparametrize_sql_query(
 												{
 													++i;
 													nCharCode = strSQL.charCodeAt(i);
-													
-													// Reset.
-													bPreviousWhiteSpace = false;
 												}
 
 												bWhiteSpaceEncountered = true;
