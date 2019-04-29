@@ -37,6 +37,7 @@ const strOutputSQL_MySQL = unparametrize_sql_query(/*sql*/ `
 				FROM whatever
 				FORCE INDEX (bigger_than_the_table_itself)
 			),
+			@var_Name := '',
 			1 / 0 * 3, -- Division by zero?,
 			111 / 0 * 333, -- Division by zero?,
 			-5 / -1000.11 +3,
@@ -91,7 +92,7 @@ const strOutputSQL_MySQL = unparametrize_sql_query(/*sql*/ `
 		ORDER BY FIELD(user_phone_call_uniqueid, 'abc', 'def', 'xxx', 1, -1)
 `, {bThrowOnSyntaxError: true});
 
-const strControlValue_MySQL = "SELECT * FROM ( SELECT DISTINCT unique_random_numbers_anyway, ( SELECT * FROM whatever FORCE INDEX (bigger_than_the_table_itself) ), ? / ? * ?, ? / ? * ?, ? / ? +?, ?, ? + (?) - ? + ( ?), ? AS I_AM_A_blob, COUNT(*), CONCAT(?, ?, ?, ?) FROM users LEFT JOIN something ON something.user_id = users.user_id WHERE ?=? AND `quoted_name`=? AND ?=? OR`quoted_name` >= ? OR xxx NOT IN ( ?, ?, ?) AND zzz not in (?, ?, ?, (select name from cache limit ?), ?, column_name) AND something.user_id IS NULL AND user_id = ? AND wage > ? AND name LIKE ? ORDER BY user_date_created DESC LIMIT ? UNION SELECT `database name with spaces`.`012345799` FROM xxxx ) ORDER BY ORDER BY FIELD(user_phone_call_uniqueid, ?, ?, ?, ?, ?)";
+const strControlValue_MySQL = "SELECT * FROM ( SELECT DISTINCT unique_random_numbers_anyway, ( SELECT * FROM whatever FORCE INDEX (bigger_than_the_table_itself) ), @var_Name := ?, ? / ? * ?, ? / ? * ?, ? / ? +?, ?, ? + (?) - ? + ( ?), ? AS I_AM_A_blob, COUNT(*), CONCAT(?, ?, ?, ?) FROM users LEFT JOIN something ON something.user_id = users.user_id WHERE ?=? AND `quoted_name`=? AND ?=? OR`quoted_name` >= ? OR xxx NOT IN ( ?, ?, ?) AND zzz not in (?, ?, ?, (select name from cache limit ?), ?, column_name) AND something.user_id IS NULL AND user_id = ? AND wage > ? AND name LIKE ? ORDER BY user_date_created DESC LIMIT ? UNION SELECT `database name with spaces`.`012345799` FROM xxxx ) ORDER BY ORDER BY FIELD(user_phone_call_uniqueid, ?, ?, ?, ?, ?)";
 assert.strictEqual(strOutputSQL_MySQL, strControlValue_MySQL, `${strOutputSQL_MySQL} !== ${strControlValue_MySQL}`);
 
 
