@@ -16,7 +16,7 @@ function unparametrize_sql_query(
 		// Turn off to keep the query formatting.
 		bStripWhiteSpace = true, 
 		
-		// Turn off is expecting lots of syntax errors.
+		// Turn off if expecting lots of syntax errors.
 		bWriteSyntaxErrorsToConsole = true, 
 
 		// You may turn this off for performance reasons (avoid a try catch).
