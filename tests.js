@@ -97,6 +97,9 @@ assert.strictEqual(strOutputSQL_MySQL, strControlValue_MySQL, `${strOutputSQL_My
 
 assert.strictEqual(unparametrize_sql_query("NOT IN (-19, '333', 33)", {bReduceEnumsToOneElement: true}), "NOT IN (?)");
 
+// Identifier next to IN without space.
+assert.strictEqual(unparametrize_sql_query("`column_name`in (-19, '333', 33)", {bReduceEnumsToOneElement: true}), "`column_name`in (?)");
+
 assert.strictEqual(unparametrize_sql_query("ORDER BY FIELD (column_name, -19, '333', 33)", {bReduceEnumsToOneElement: true}), "ORDER BY FIELD (column_name, ?)");
 
 

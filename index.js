@@ -402,8 +402,8 @@ function unparametrize_sql_query(
 	// Not yet optimized to reduce IN and NOT IN params in a single pass.
 	if(bReduceEnumsToOneElement)
 	{
-		strOutputSQL = strOutputSQL.replace(/([\s]{0,}|`)IN([\s]{0,})\([\s]{0,}\?[\s]{0,}([\s]{0,},[\s]{0,}\?)+\)/gi, "$1IN$2(?)");
-		strOutputSQL = strOutputSQL.replace(/([\s]{1})FIELD([\s]{0,})\(([^,]+)([\s]{0,},[\s]{0,}\?)+\)/gi, "$1FIELD$2($3, ?)");
+		strOutputSQL = strOutputSQL.replace(/([\s]{0,}|`)(IN)([\s]{0,})\([\s]{0,}\?[\s]{0,}([\s]{0,},[\s]{0,}\?)+\)/gi, "$1$2$3(?)");
+		strOutputSQL = strOutputSQL.replace(/([\s]{1})(FIELD)([\s]{0,})\(([^,]+)([\s]{0,},[\s]{0,}\?)+\)/gi, "$1$2$3($4, ?)");
 	}
 
 	if(
