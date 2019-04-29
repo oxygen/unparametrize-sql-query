@@ -23,7 +23,14 @@ function unparametrize_sql_query(
 		bThrowOnSyntaxError = true,
 
 		// Wether to add string quotes like MySQL Performance Schema does: '?' instead of ?.
-		bAddRemovedStringQuotes = false
+		bAddRemovedStringQuotes = false,
+
+		// NOT IN (1, 2, 3, 4) could very well be NOT IN (1, 2, 3, 4, 5, 6) for the same query on subsequent executions. Performance counters would be counted separately.
+		// If true, IN (1, 2, 3, 4) becomes IN (?) instead of IN (?, ?, ?, ?).
+		// However, IN (1, 2, 3, column_name) is untouched and becomes IN (?, ?, ?, column_name).
+		// Also, IN (1, 2, 3, (SELECT column_name FROM table LIMIT 1)) is untouched and becomes IN (?, ?, ?, (SELECT column_name FROM table LIMIT ?)).
+		// If true, a second pass is made with a replace regex.
+		bReduceNotInAndInParamsToOne = false
 	} = {}
 )
 {
@@ -342,6 +349,9 @@ function unparametrize_sql_query(
 												{
 													++i;
 													nCharCode = strSQL.charCodeAt(i);
+													
+													// Reset.
+													bPreviousWhiteSpace = false;
 												}
 
 												bWhiteSpaceEncountered = true;
@@ -391,6 +401,11 @@ function unparametrize_sql_query(
 		}
 	}
 
+	// Not yet optimized to reduce IN and NOT IN params in a single pass.
+	if(bReduceNotInAndInParamsToOne)
+	{
+		strOutputSQL = strOutputSQL.replace(/([\s]{0,}|`)IN([\s]{0,})\([\s]{0,}\?[\s]{0,}([\s]{0,},[\s]{0,}\?)+\)/g, "$1IN$2(?)");
+	}
 
 	if(
 		bInsideBlockComment
