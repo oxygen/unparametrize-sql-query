@@ -1,0 +1,22 @@
+{
+  "name": "unparametrize-sql-query",
+  "version": "1.0.0",
+  "homepage": "https://github.com/oxygen/unparametrize-sql-query",
+  "description": "Removes string literals, number constants and excess whitespace from an SQL in one pass. The removed string literals and number constants are replaced with '?' and ? respectively.",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=10.15.3"
+  },
+  "scripts": {
+    "test": "node tests.js",
+    "build": "node build.js"
+  },
+  "author": "tiberiu.ionut.stan@gmail.com",
+  "license": "MIT",
+  "files": [
+    "index.js",
+    "LICENSE"
+  ]
+}

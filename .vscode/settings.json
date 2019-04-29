@@ -1,0 +1,5 @@
+{
+    "window.title": "Unparametrize SQL query",
+    "editor.renderWhitespace": "all",
+    "editor.insertSpaces": false
+}
