@@ -1,3 +1,10 @@
+// @TODO
+// Temporary workaround to support the optional bReduceEnumsToOneElement option (ORDER BY FIELD and NOT IN and IN enumerated values to a single question mark).
+// Regex is 10 times slower than hand coded JS (at least), regex needs to dissapear entirely and this feature needs to be reworked into the algorithm.
+const regexReduceInNotInEnumToOneElement = /([\s]{0,}|`)(IN)([\s]{0,})\([\s]{0,}\?[\s]{0,}([\s]{0,},[\s]{0,}\?)+\)/gi;
+const regexReduceOrderByFieldEnumToOneElement = /([\s]{1})(FIELD)([\s]{0,})\(([^,]+)([\s]{0,},[\s]{0,}\?)+\)/gi;
+
+
 /**
  * @param {string} strSQL 
  * @param {Object} destructuringObject
@@ -139,7 +146,7 @@ function unparametrize_sql_query(
 			)
 			{
 				strOutputSQL += strSQL[i];
-
+				
 				if(i + 1 >= strSQL.length)
 				{
 					bInsideName = false;
@@ -311,55 +318,50 @@ function unparametrize_sql_query(
 			default:
 				let nCharCode = strSQL.charCodeAt(i);
 
-				// Skip number sign (+ or -) if before a number and right after other arithmetic operators, bitwise operators, left round paranthesis or comma.
-				if(strSQL[i] === "-" || strSQL[i] === "+")
+				// Skip leading negative number sign (-123) if before a number and right after other arithmetic operators, bitwise operators, left round paranthesis or comma.
+				if(strSQL[i] === "-")
 				{
-					let nCharacterPosition = i;
-					while(++nCharacterPosition < strSQL.length)
+					let nCharacterPositionLookAhead = i;
+
+					while(++nCharacterPositionLookAhead < strSQL.length)
 					{
 						if(
-							strSQL.charCodeAt(nCharacterPosition) >= /*0*/ 0x30 
-							&& strSQL.charCodeAt(nCharacterPosition) <= /*9*/ 0x39
+							// Found a number
+							strSQL.charCodeAt(nCharacterPositionLookAhead) >= /*0*/ 0x30 
+							&& strSQL.charCodeAt(nCharacterPositionLookAhead) <= /*9*/ 0x39
 						)
 						{
-							nCharacterPosition = i;
-							let bWhiteSpaceEncountered = false;
-							while(--nCharacterPosition >= 0)
+							let nCharacterPositionLookBehind = i;
+
+							// Look behind see what precedes the number sign.
+							while(--nCharacterPositionLookBehind >= 0)
 							{
-								if([" ", "\t", "\r", "\n"].includes(strSQL[nCharacterPosition]))
+								if([" ", "\t", "\r", "\n"].includes(strSQL[nCharacterPositionLookBehind]))
 								{
-									bWhiteSpaceEncountered = true;
+									bWhiteSpaceAlreadyEncountered = true;
 									continue;
 								}
-			
+								
+								let nCharCodeCharacterPosition; 
 								if(
-									["+", "-", "/", "*", "%", "&", "~", "|", "^", "(", ","].includes(strSQL[nCharacterPosition])
-									|| [">>", "<<"].includes(strSQL.substr(nCharacterPosition - 1, 2))
+									["<", ">", "=", "+", "-", "/", "*", "%", "&", "~", "|", "^", "(", ","].includes(strSQL[nCharacterPositionLookBehind])
+									|| [">>", "<<", "<>", "!="].includes(strSQL.substr(nCharacterPositionLookBehind - 1, 2))
+									|| (
+										(/*lazy init*/ nCharCodeCharacterPosition = strSQL.charCodeAt(nCharacterPositionLookBehind)) >= /*A*/ 0x41
+										&& nCharCodeCharacterPosition <= /*Z*/ 0x5A
+									)
+									|| (
+										nCharCodeCharacterPosition >= /*a*/ 0x61
+										&& nCharCodeCharacterPosition <= /*z*/ 0x7A
+									)
+									|| nCharCodeCharacterPosition === /*_*/ 0x5F
 								)
 								{
-									++i;
+									// Skip from - sign to to number's first digit.
+									i = nCharacterPositionLookAhead;
 									nCharCode = strSQL.charCodeAt(i);
-
-									if(bStripWhiteSpace)
-									{
-										while(i < strSQL.length)
-										{
-											if([" ", "\t", "\r", "\n"].includes(strSQL[i]))
-											{
-												if(bWhiteSpaceEncountered)
-												{
-													++i;
-													nCharCode = strSQL.charCodeAt(i);
-												}
-
-												bWhiteSpaceEncountered = true;
-
-												continue;
-											}
-											
-											break;
-										}
-									}
+									bInsideNumber = true;
+									continue charactersLoop;
 								}
 
 								break;
@@ -367,6 +369,15 @@ function unparametrize_sql_query(
 
 							break;
 						}
+
+						// Still hoping for a first digit.
+						else if([" ", "\t", "\r", "\n"].includes(strSQL[nCharacterPositionLookAhead]))
+						{
+							continue;
+						}
+
+						// Nope, no digits came ahead.
+						break;
 					}
 				}
 
@@ -395,15 +406,32 @@ function unparametrize_sql_query(
 					bInsideName = true;
 				}
 
-				strOutputSQL += strSQL[i];
+				if(bStripWhiteSpace)
+				{
+					if(["\n", "\r", "\t"].includes(strSQL[i]))
+					{
+						strOutputSQL += " ";
+					}
+					else
+					{
+						strOutputSQL += strSQL[i];
+					}
+				}
+				else
+				{
+					strOutputSQL += strSQL[i];
+				}
 		}
 	}
 
 	// Not yet optimized to reduce IN and NOT IN params in a single pass.
 	if(bReduceEnumsToOneElement)
 	{
-		strOutputSQL = strOutputSQL.replace(/([\s]{0,}|`)(IN)([\s]{0,})\([\s]{0,}\?[\s]{0,}([\s]{0,},[\s]{0,}\?)+\)/gi, "$1$2$3(?)");
-		strOutputSQL = strOutputSQL.replace(/([\s]{1})(FIELD)([\s]{0,})\(([^,]+)([\s]{0,},[\s]{0,}\?)+\)/gi, "$1$2$3($4, ?)");
+		regexReduceInNotInEnumToOneElement.lastIndex = 0;
+		strOutputSQL = strOutputSQL.replace(regexReduceInNotInEnumToOneElement, "$1$2$3(?)");
+
+		regexReduceOrderByFieldEnumToOneElement.lastIndex = 0;
+		strOutputSQL = strOutputSQL.replace(regexReduceOrderByFieldEnumToOneElement, "$1$2$3($4, ?)");
 	}
 
 	if(
