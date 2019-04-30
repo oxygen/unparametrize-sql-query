@@ -1,6 +1,7 @@
 // @TODO
 // Temporary workaround to support the optional bReduceEnumsToOneElement option (ORDER BY FIELD and NOT IN and IN enumerated values to a single question mark).
-// Regex is 10 times slower than hand coded JS (at least), regex needs to dissapear entirely and this feature needs to be reworked into the algorithm.
+// Regex needs to dissapear entirely and this feature needs to be reworked into the algorithm to run these in one pass.
+// A partial optimization would be to selectively run the replace only if the IN or FIELD words are encountered.
 const regexReduceInNotInEnumToOneElement = /([\s]{0,}|`)(IN)([\s]{0,})\([\s]{0,}\?[\s]{0,}([\s]{0,},[\s]{0,}\?)+\)/gi;
 const regexReduceOrderByFieldEnumToOneElement = /([\s]{1})(FIELD)([\s]{0,})\(([^,]+)([\s]{0,},[\s]{0,}\?)+\)/gi;
 
