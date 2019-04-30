@@ -86,7 +86,7 @@ const strMySQLQuery = /*sql*/`
 
 			-- NOT IN and IN may vary in number of elements dynamically for the same query, usually when they don't contain any subqueries.
 			OR xxx NOT IN ( - 999, 'AAA', -59)
-			AND zzz not in ('a', -12.9999, 0xAFED13, (select name from cache limit 1), 0, column_name)
+			AND zzz not in ('a', -12.99e-99, 0xAFED13, (select name from cache limit 1), 0, column_name)
 			
 			AND	-user_id = -123 -- That minus sign must be gone. Only questions must remain. Except for the name which must keep the minus sign.
 			AND	wage > 0.1

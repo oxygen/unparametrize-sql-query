@@ -190,6 +190,14 @@ function unparametrize_sql_query(
 					bInsideNumber = false;
 					break charactersLoop;
 				}
+
+				if(
+					["e", "E"].includes(strSQL[i])
+					&& strSQL[i + 1] === "-"
+				)
+				{
+					++i;
+				}
 				
 				nCharCode = strSQL.charCodeAt(++i);
 			}
