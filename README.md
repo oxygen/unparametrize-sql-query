@@ -48,88 +48,113 @@ console.log(unparametrize_sql_query("SELECT 123 FROM table"));
 #### Input
 ```sql
 SELECT
-	-- One line comment with /* stream comment inside of it */ and another right after -- I want my independence
-	DISTINCT unique_random_numbers_anyway,
-	(
-		SELECT  
-			*
-		FROM whatever
-		FORCE INDEX (bigger_than_the_table_itself)
-	),
-	1 / 0 * 3, -- Division by zero?,
-	111 / 0 * 333, -- Division by zero?,
-	0xAFE0 AS I_AM_A_blob,
-	COUNT(*), -- is this allowed here anyway?,
-	CONCAT('', 'aaaa', 'bbbb', 1234)
-FROM users /* Why do we have stream comments? */
-LEFT JOIN something ON something.user_id = users.user_id
-WHERE
-	-- We joined you to leave you
-	something.user_id IS NULL
-	
-	AND
-	user_id = 123
+	*
+FROM
+(
+	SELECT
+		-- One line comment with /* stream comment inside of it */ and another right after -- I want my independence
+		DISTINCT unique_random_numbers_anyway,
+		(
+			SELECT  
+				COUNT(*),
+				*
+			FROM whatever
+			FORCE INDEX (bigger_than_the_table_itself)
+		),
+		@var_Name := CONCAT('''', "'abc'", "/*' -- Hello'*/", '\r\n\t -- line comment inside string? It can''t be. /* block comment */ '''' '),
+		'"/*''\r\n\t*/"', -- Confusing start of block comment: /*
+		-3 + (-9) - - 3 + ( -    99 + 2 % -5 | 333 ~999&111111111 * -0.00  *  +   33 >> +123 << ++321.22) ^ 0xAFe0 AS `Computer error 123`
+	FROM users /* Why do we have stream comments? */
+	LEFT JOIN something ON something.user_id = users.user_id
+	WHERE
+		-- We joined you to kill you. TROJAN JOIN
+		something.user_id IS NULL
 
-	AND
-	wage > 0.1
-	
-	AND
-	name LIKE '%this will be stripped%'
-ORDER BY
-	user_date_created DESC /* 
-	Multi-line comment means importance!
-	Right?
-	Right?!
-*/
-LIMIT 1460 /* LIMIT HERE? */ -- Noooo!
+		AND	-1=-+-+-++-1
+		AND -1=-+-+-++1
+		
+		AND	`quoted_name`='2019-12-12'
+		OR`quoted_name` >= '2019-12-12T12:34:56Z'
 
-UNION -- ALL
+		-- NOT IN and IN may vary in number of elements dynamically for the same query, usually when they don't contain any subqueries.
+		OR xxx NOT IN ( - 999, 'AAA', -59)
+		AND zzz not in ('a', -12.9999, 0xAFED13, (select name from cache limit 1), 0, column_name)
+		
+		AND	-user_id = -123 -- That minus sign must be gone. Only questions must remain. Except for the name which must keep the minus sign.
+		AND	wage > 0.1
+		
+		AND	name LIKE '%I will become a question mark% start of block comment: /*'
+	ORDER BY
+		user_date_created DESC /* 
+		Multi-line comment means importance!
+		ortance...
+		tance...
+		sss...
+	*/
+	LIMIT 1460 /* LIMIT HERE? */ -- Noooo!
 
-SELECT
-	`database name with spaces`./*table name with numbers*/`012345799`
-FROM xxxx
+	UNION -- ALL
+
+	SELECT
+		`database name with spaces`./*What am I?*/`012345799`
+	FROM xxxx
+)
+ORDER BY FIELD(user_phone_call_uniqueid, 'abc', 'def', 'xxx', 1, -1)
 ```
 
 #### Output
 ```sql
-SELECT DISTINCT unique_random_numbers_anyway, ( SELECT * FROM whatever FORCE INDEX (bigger_than_the_table_itself) ), ? / ? * ?, ? / ? * ?, ? AS I_AM_A_blob, COUNT(*), CONCAT('?', '?', '?', ?) FROM users LEFT JOIN something ON something.user_id = users.user_id WHERE something.user_id IS NULL AND user_id = ? AND wage > ? AND name LIKE '?' ORDER BY user_date_created DESC LIMIT ? UNION SELECT `database name with spaces`.`012345799` FROM xxxx
+SELECT * FROM ( SELECT DISTINCT unique_random_numbers_anyway, ( SELECT COUNT(*), * FROM whatever FORCE INDEX (bigger_than_the_table_itself) ), @var_Name := CONCAT(?, ?, ?, ?), ?, ? + (?) - ? + ( ? + ? % ? | ? ~?&? * ? * + ? >> +? << ++?) ^ ? AS `Computer error 123` FROM users LEFT JOIN something ON something.user_id = users.user_id WHERE something.user_id IS NULL AND ?=-+-+-++? AND ?=-+-+-++? AND `quoted_name`=? OR`quoted_name` >= ? OR xxx NOT IN (?) AND zzz not in (?, ?, ?, (select name from cache limit ?), ?, column_name) AND -user_id = ? AND wage > ? AND name LIKE ? ORDER BY user_date_created DESC LIMIT ? UNION SELECT `database name with spaces`.`012345799` FROM xxxx ) ORDER BY FIELD(user_phone_call_uniqueid, ?)
 ```
 
 #### Output with whitespace preserved
 ```sql
 SELECT
-	DISTINCT unique_random_numbers_anyway,
-	(
-		SELECT
-			*
-		FROM whatever
-		FORCE INDEX (bigger_than_the_table_itself)
-	),
-	? / ? * ?,
-	? / ? * ?,
-	? AS I_AM_A_blob,
-	COUNT(*),
-	CONCAT('?', '?', '?', ?)
-FROM users
-LEFT JOIN something ON something.user_id = users.user_id
-WHERE
-	something.user_id IS NULL
+	*
+FROM
+(
+	SELECT
 
-	AND
-	user_id = ?
+		DISTINCT unique_random_numbers_anyway,
+		(
+			SELECT  
+				COUNT(*),
+				*
+			FROM whatever
+			FORCE INDEX (bigger_than_the_table_itself)
+		),
+		@var_Name := CONCAT(?, ?, ?, ?),
+		?,
+		? + (?) - ? + ( ? + ? % ? | ? ~?&? * ?  *  +   ? >> +? << ++?) ^ ? AS `Computer error 123`
+	FROM users
+	LEFT JOIN something ON something.user_id = users.user_id
+	WHERE
 
-	AND
-	wage > ?
+		something.user_id IS NULL
 
-	AND
-	name LIKE '?'
-ORDER BY
-	user_date_created DESC
-LIMIT ?
+		AND	?=-+-+-++?
+		AND ?=-+-+-++?
+		
+		AND	`quoted_name`=?
+		OR`quoted_name` >= ?
 
-UNION
 
-SELECT
-	`database name with spaces`.`012345799`
-FROM xxxx
+		OR xxx NOT IN (?)
+		AND zzz not in (?, ?, ?, (select name from cache limit ?), ?, column_name)
+
+		AND	-user_id = ?
+		AND	wage > ?
+		
+		AND	name LIKE ?
+	ORDER BY
+		user_date_created DESC
+	LIMIT ?
+
+	UNION
+
+	SELECT
+		`database name with spaces`.`012345799`
+	FROM xxxx
+)
+ORDER BY FIELD(user_phone_call_uniqueid, ?)
 ```
