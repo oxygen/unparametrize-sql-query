@@ -91,6 +91,7 @@ const regexStripWhiteSpace = /[\s]+/g;
 
 
 const strMySQLQuery = /*sql*/`
+	-- Chicken and the egg traps disabled throughout the query because the regexes above can't handle them.
 	SELECT
 		*
 	FROM
