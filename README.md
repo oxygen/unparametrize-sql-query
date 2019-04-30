@@ -8,7 +8,7 @@ Removes string literals, number constants, comments and excess whitespace from a
 
 The goal is to reduce a query to a unique (common) form which could be used, for example, to keep performance counters per query (just like MySQL Performance Reports does).
 
-This project was written as a support library for per process performance counters because the MySQL Performance Schema is disabled in Google Cloud SQL.
+This project was written as a support library for [sql-performance-counters](https://github.com/oxygen/sql-performance-counters-nodejs) because the MySQL Performance Schema is disabled in Google Cloud SQL.
 
 ## Installation:
 
