@@ -2,7 +2,7 @@ const exec = require("child_process").exec;
 
 
 
-// Regex sucks donkey ballz next to Array.includes() for single character match.
+// Regex is amazingly slow next to Array.includes() for single character match.
 
 // Without regex reuse:
 // single character match with regex:  130  milliseconds
