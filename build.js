@@ -36,6 +36,6 @@ process.on(
 	const strBrowserFilePath = path.join(__dirname, "dist/browser/unparametrize-sql-query.js");
 	
 	const strTheOneAndOnlyFile = await fsp.readFile("./index.js", "utf8");
-	const strOutputFileContents = strTheOneAndOnlyFile.replace(/module\.exports.*;/g, "");
+	const strOutputFileContents = strTheOneAndOnlyFile.replace(/module\.exports[^\r\n]+;/g, "");
 	await fsp.writeFile(strBrowserFilePath, strOutputFileContents);
 })();
