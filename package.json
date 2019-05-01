@@ -21,6 +21,7 @@
   "license": "MIT",
   "files": [
     "index.js",
-    "LICENSE"
+    "LICENSE",
+    "dist/*"
   ]
 }
