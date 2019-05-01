@@ -20,6 +20,7 @@ npm i unparametrize-sql-query
 ### Browser
 (if you don't have a build system):
 ```html
+<!-- NEVER serve static content directly from node_modules! Just illustrating the file paths here. -->
 <script src="/node_modules/unparametrize-sql-query/dist/browser/unparametrize-sql-query.js"></script>
 ```
 
